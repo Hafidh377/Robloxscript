@@ -1,32 +1,39 @@
--- ✅ Only allow in Steal a Brainrot
+-- Only run in Steal a Brainrot
 if game.PlaceId ~= 16124729541 then
+    warn("Not Steal a Brainrot, script stopped.")
     return
 end
 
--- ✅ Wait for game & player to load
-repeat wait() until game:IsLoaded() and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+repeat wait() until game:IsLoaded()
+repeat wait() until game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
 
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
 local UserInputService = game:GetService("UserInputService")
-local isMobile = UserInputService.TouchEnabled
 
--- ✅ Remove old GUI if exists
+print("[VustHub] Script started")
+
+-- Remove old GUI if exists
 pcall(function()
-    player.PlayerGui:FindFirstChild("VustHub"):Destroy()
+    local oldGui = player.PlayerGui:FindFirstChild("VustHub")
+    if oldGui then
+        oldGui:Destroy()
+        print("[VustHub] Old GUI destroyed")
+    end
 end)
 
--- ✅ Create GUI
+-- Create new ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "VustHub"
-gui.Parent = player.PlayerGui
 gui.ResetOnSpawn = false
+gui.Parent = player.PlayerGui
 
--- ✅ Toggle Button
+-- Toggle Button
 local toggleBtn = Instance.new("TextButton")
 toggleBtn.Size = UDim2.new(0, 120, 0, 40)
 toggleBtn.Position = UDim2.new(0, 10, 0.5, -20)
+toggleBtn.AnchorPoint = Vector2.new(0, 0.5)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleBtn.Text = "Vust Hub"
@@ -34,15 +41,16 @@ toggleBtn.Font = Enum.Font.GothamBold
 toggleBtn.TextScaled = true
 toggleBtn.Parent = gui
 
--- ✅ Main Frame
+-- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 250, 0, 220)
 mainFrame.Position = UDim2.new(0.5, -125, 0.5, -110)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.Visible = false
 mainFrame.Parent = gui
 
--- ✅ Title
+-- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "Vust Hub - Brainrot"
@@ -52,10 +60,11 @@ title.Font = Enum.Font.GothamBold
 title.TextScaled = true
 title.Parent = mainFrame
 
--- ✅ Close Button
+-- Close Button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.AnchorPoint = Vector2.new(1, 0)
 closeBtn.Text = "X"
 closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
@@ -63,7 +72,6 @@ closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextScaled = true
 closeBtn.Parent = mainFrame
 
--- ✅ Utility to make buttons
 local function createBtn(text, yPos, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.8, 0, 0, 40)
@@ -75,18 +83,20 @@ local function createBtn(text, yPos, callback)
     btn.TextScaled = true
     btn.Parent = mainFrame
     btn.MouseButton1Click:Connect(callback)
+    return btn
 end
 
--- ✅ Boost Buttons
-createBtn("Jump Boost", 0.25, function()
+createBtn("Jump Boost", 50, function()
     humanoid.JumpPower = 300
+    print("[VustHub] Jump Boost activated")
 end)
 
-createBtn("Speed Boost", 0.45, function()
+createBtn("Speed Boost", 100, function()
     humanoid.WalkSpeed = 100
+    print("[VustHub] Speed Boost activated")
 end)
 
-createBtn("Infinite Jump", 0.65, function()
+createBtn("Infinite Jump", 150, function()
     if not getgenv().infJump then
         getgenv().infJump = true
         UserInputService.JumpRequest:Connect(function()
@@ -94,16 +104,17 @@ createBtn("Infinite Jump", 0.65, function()
                 humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end)
+        print("[VustHub] Infinite Jump activated")
     end
 end)
 
--- ✅ Toggle GUI open/close
 toggleBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = not mainFrame.Visible
+    print("[VustHub] Toggled Main Frame:", mainFrame.Visible)
 end)
 
--- ✅ Close GUI completely
 closeBtn.MouseButton1Click:Connect(function()
-    getgenv().infJump = false
     gui:Destroy()
+    getgenv().infJump = false
+    print("[VustHub] GUI closed")
 end)
