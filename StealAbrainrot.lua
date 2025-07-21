@@ -1,120 +1,105 @@
--- Only run in Steal a Brainrot
+-- Check game ID
 if game.PlaceId ~= 16124729541 then
-    warn("Not Steal a Brainrot, script stopped.")
-    return
+    return warn("This script only works in Steal a Brainrot.")
 end
 
 repeat wait() until game:IsLoaded()
 repeat wait() until game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
 
+-- References
 local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local humanoid = char:WaitForChild("Humanoid")
-local UserInputService = game:GetService("UserInputService")
-
-print("[VustHub] Script started")
-
--- Remove old GUI if exists
-pcall(function()
-    local oldGui = player.PlayerGui:FindFirstChild("VustHub")
-    if oldGui then
-        oldGui:Destroy()
-        print("[VustHub] Old GUI destroyed")
-    end
-end)
-
--- Create new ScreenGui
-local gui = Instance.new("ScreenGui")
-gui.Name = "VustHub"
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local uis = game:GetService("UserInputService")
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.Name = "VustHubUI"
 gui.ResetOnSpawn = false
-gui.Parent = player.PlayerGui
+
+-- Remove duplicates
+pcall(function()
+	local old = player.PlayerGui:FindFirstChild("VustHubUI")
+	if old then old:Destroy() end
+end)
 
 -- Toggle Button
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Size = UDim2.new(0, 120, 0, 40)
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 100, 0, 40)
 toggleBtn.Position = UDim2.new(0, 10, 0.5, -20)
-toggleBtn.AnchorPoint = Vector2.new(0, 0.5)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 toggleBtn.Text = "Vust Hub"
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
 toggleBtn.Font = Enum.Font.GothamBold
 toggleBtn.TextScaled = true
-toggleBtn.Parent = gui
 
--- Main Frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 250, 0, 220)
-mainFrame.Position = UDim2.new(0.5, -125, 0.5, -110)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.Visible = false
-mainFrame.Parent = gui
+-- Main UI Frame
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 250, 0, 200)
+frame.Position = UDim2.new(0.5, -125, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Visible = false
 
 -- Title
-local title = Instance.new("TextLabel")
+local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "Vust Hub - Brainrot"
+title.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+title.Text = "Vust Hub"
 title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 title.Font = Enum.Font.GothamBold
 title.TextScaled = true
-title.Parent = mainFrame
 
 -- Close Button
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -35, 0, 5)
-closeBtn.AnchorPoint = Vector2.new(1, 0)
-closeBtn.Text = "X"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextScaled = true
-closeBtn.Parent = mainFrame
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Font = Enum.Font.GothamBold
+close.TextScaled = true
 
-local function createBtn(text, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.8, 0, 0, 40)
-    btn.Position = UDim2.new(0.1, 0, 0, yPos)
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    btn.Font = Enum.Font.GothamBold
-    btn.TextScaled = true
-    btn.Parent = mainFrame
-    btn.MouseButton1Click:Connect(callback)
-    return btn
+-- Infinite Jump Setup
+local infJumpEnabled = false
+local infJumpConnection
+
+-- Buttons
+local function createButton(text, y, action)
+	local btn = Instance.new("TextButton", frame)
+	btn.Size = UDim2.new(0.8, 0, 0, 40)
+	btn.Position = UDim2.new(0.1, 0, 0, y)
+	btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Text = text
+	btn.Font = Enum.Font.GothamBold
+	btn.TextScaled = true
+	btn.MouseButton1Click:Connect(action)
 end
 
-createBtn("Jump Boost", 50, function()
-    humanoid.JumpPower = 300
-    print("[VustHub] Jump Boost activated")
+-- Button Actions
+createButton("Jump Boost", 50, function()
+	humanoid.JumpPower = 300
 end)
 
-createBtn("Speed Boost", 100, function()
-    humanoid.WalkSpeed = 100
-    print("[VustHub] Speed Boost activated")
+createButton("Speed Boost", 100, function()
+	humanoid.WalkSpeed = 100
 end)
 
-createBtn("Infinite Jump", 150, function()
-    if not getgenv().infJump then
-        getgenv().infJump = true
-        UserInputService.JumpRequest:Connect(function()
-            if getgenv().infJump then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end
-        end)
-        print("[VustHub] Infinite Jump activated")
-    end
+createButton("Infinite Jump", 150, function()
+	if infJumpConnection then infJumpConnection:Disconnect() end
+	infJumpEnabled = true
+	infJumpConnection = uis.JumpRequest:Connect(function()
+		if infJumpEnabled then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end)
 end)
 
+-- Toggle visibility
 toggleBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = not mainFrame.Visible
-    print("[VustHub] Toggled Main Frame:", mainFrame.Visible)
+	frame.Visible = not frame.Visible
 end)
 
-closeBtn.MouseButton1Click:Connect(function()
-    gui:Destroy()
-    getgenv().infJump = false
-    print("[VustHub] GUI closed")
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+	infJumpEnabled = false
+	if infJumpConnection then infJumpConnection:Disconnect() end
 end)
