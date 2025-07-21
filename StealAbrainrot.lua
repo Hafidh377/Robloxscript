@@ -1,111 +1,109 @@
 -- ✅ Only allow in Steal a Brainrot
 if game.PlaceId ~= 16124729541 then
-    warn("This script only works in Steal a Brainrot.")
     return
 end
 
--- ✅ Wait for game and PlayerGui to load
-repeat wait() until game:IsLoaded()
-repeat wait() until game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+-- ✅ Wait for game & player to load
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
 
--- ✅ Detect mobile vs PC
-local isMobile = game:GetService("UserInputService").TouchEnabled
-if isMobile then
-    warn("Running on mobile.")
-else
-    warn("Running on PC.")
-end
-
--- ✅ Setup references
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
+local UserInputService = game:GetService("UserInputService")
+local isMobile = UserInputService.TouchEnabled
 
--- ✅ GUI Setup
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "BrainrotBoostGUI"
+-- ✅ Remove old GUI if exists
+pcall(function()
+    player.PlayerGui:FindFirstChild("VustHub"):Destroy()
+end)
+
+-- ✅ Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "VustHub"
+gui.Parent = player.PlayerGui
 gui.ResetOnSpawn = false
 
--- Toggle Button
-local toggleButton = Instance.new("TextButton", gui)
-toggleButton.Size = UDim2.new(0, 120, 0, 40)
-toggleButton.Position = UDim2.new(0, 10, 0.5, -20)
-toggleButton.Text = "Vust Hub"
-toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.Font = Enum.Font.SourceSansBold
-toggleButton.TextScaled = true
+-- ✅ Toggle Button
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 120, 0, 40)
+toggleBtn.Position = UDim2.new(0, 10, 0.5, -20)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.Text = "Vust Hub"
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextScaled = true
+toggleBtn.Parent = gui
 
--- Main Frame
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 250, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -125, 0.5, -100)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+-- ✅ Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 250, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -125, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 mainFrame.Visible = false
+mainFrame.Parent = gui
 
--- Title Bar
-local title = Instance.new("TextLabel", mainFrame)
+-- ✅ Title
+local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
 title.Text = "Vust Hub - Brainrot"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-title.Font = Enum.Font.SourceSansBold
+title.Font = Enum.Font.GothamBold
 title.TextScaled = true
+title.Parent = mainFrame
 
--- Close Button
-local closeButton = Instance.new("TextButton", mainFrame)
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextScaled = true
+-- ✅ Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextScaled = true
+closeBtn.Parent = mainFrame
 
--- Function to create UI buttons
-local function createButton(text, y)
-	local btn = Instance.new("TextButton", mainFrame)
-	btn.Size = UDim2.new(0.8, 0, 0, 40)
-	btn.Position = UDim2.new(0.1, 0, 0, y)
-	btn.Text = text
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-	btn.Font = Enum.Font.SourceSansBold
-	btn.TextScaled = true
-	return btn
+-- ✅ Utility to make buttons
+local function createBtn(text, yPos, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, yPos)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.Parent = mainFrame
+    btn.MouseButton1Click:Connect(callback)
 end
 
--- GUI Buttons
-local jumpBoost = createButton("Jump Boost", 60)
-local speedBoost = createButton("Speed Boost", 110)
-local infJump = createButton("Infinite Jump", 160)
-
--- Button Functionality
-jumpBoost.MouseButton1Click:Connect(function()
+-- ✅ Boost Buttons
+createBtn("Jump Boost", 0.25, function()
     humanoid.JumpPower = 300
 end)
 
-speedBoost.MouseButton1Click:Connect(function()
+createBtn("Speed Boost", 0.45, function()
     humanoid.WalkSpeed = 100
 end)
 
-infJump.MouseButton1Click:Connect(function()
-    if not getgenv().infJumping then
-        getgenv().infJumping = true
-        game:GetService("UserInputService").JumpRequest:Connect(function()
-            if getgenv().infJumping and humanoid then
+createBtn("Infinite Jump", 0.65, function()
+    if not getgenv().infJump then
+        getgenv().infJump = true
+        UserInputService.JumpRequest:Connect(function()
+            if getgenv().infJump then
                 humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
             end
         end)
     end
 end)
 
--- Toggle and Close Logic
-toggleButton.MouseButton1Click:Connect(function()
+-- ✅ Toggle GUI open/close
+toggleBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = not mainFrame.Visible
 end)
 
-closeButton.MouseButton1Click:Connect(function()
+-- ✅ Close GUI completely
+closeBtn.MouseButton1Click:Connect(function()
+    getgenv().infJump = false
     gui:Destroy()
-    getgenv().infJumping = false
 end)
